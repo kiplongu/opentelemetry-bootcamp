@@ -40,7 +40,10 @@ const init = function (serviceName: string, metricPort: number) {
     // const traceExporter = new CollectorTraceExporter({
     //     url: 'http://localhost:4318/v1/trace'
     // })
-    provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
+    // provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
+    provider.addSpanProcessor(new BatchSpanProcessor(traceExporter,{
+        scheduledDelayMillis:7000
+    }))
     provider.register();
     registerInstrumentations({
         instrumentations: [

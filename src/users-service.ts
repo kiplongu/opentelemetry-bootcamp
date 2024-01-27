@@ -62,11 +62,10 @@ redis.subscribe('my-channel', (err, data) => {
     });
 })
 
-
 setInterval(async () => {
     api.trace.getTracer('manual').startActiveSpan('Refesh cache', async (span) => {
         const apiResponse = await axios('https://mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8');
         span.end();
     });
 
-}, 60000)
+}, 1000)
