@@ -68,4 +68,4 @@ setInterval(async () => {
         span.end();
     });
 
-}, 1000)
+}, 6000)
