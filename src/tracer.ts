@@ -37,16 +37,19 @@ const init = function (serviceName: string, metricPort: number) {
         resource: serviceResources.merge(customResources)
 
     });
-
+   // Create a trace exporter to send collected spans to a collector
     const traceExporter = new CollectorTraceExporter({
         url: 'http://localhost:4318/v1/trace'
     })
-    
+
     // provider.addSpanProcessor(new BatchSpanProcessor(traceExporter,)
         // scheduledDelayMillis:7000
+
+    // Add span processors for exporting spans
     provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
     provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
+    // Register instrumentations for automatic tracing
     provider.register();
     registerInstrumentations({
         instrumentations: [
@@ -60,6 +63,7 @@ const init = function (serviceName: string, metricPort: number) {
              new WsInstrumentation()
         ]
     });
+    // Get the tracer from the provider
     const tracer = provider.getTracer(serviceName);
     return { meter, tracer };
 }
