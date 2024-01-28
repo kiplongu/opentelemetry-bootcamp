@@ -45,18 +45,25 @@ app.get('/data', async (request, response) => {
     }
 })
 
-
 app.get('/pub', (request, response) => {
+    // Retrieve the currently active span from the OpenTelemetry API
     const activeSpan = api.trace.getSpan(api.context.active());
 
+    // Prepare a payload with a message
     let payload = {
         message: 'this-is-my-message'
     };
+
+    // Inject the span context into the payload using propagation
     api.propagation.inject(api.trace.setSpan(api.context.active(), activeSpan), payload);
 
+    // Publish the payload (converted to a JSON string) to a Redis channel named 'my-channel'
     redis.publish('my-channel', JSON.stringify(payload));
+
+    // Send a 200 OK response
     response.sendStatus(200);
-})
+});
+
 
 app.listen(8080);
 console.log('items services is up and running on port 8080');

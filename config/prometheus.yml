@@ -1,15 +1,20 @@
+# Prometheus Configuration
+
+# Global configuration settings that apply to all scrape configurations.
 global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
+  scrape_interval:     15s  # Sets the default scrape interval for all jobs.
+  evaluation_interval: 15s  # Sets the default evaluation interval for all jobs.
+
+# Scrape configurations define how Prometheus collects metrics from different targets.
 
 scrape_configs:
-  # metrics_path defaults to '/metrics'
-  # scheme defaults to 'http'.
-  - job_name: prometheus
+  # Job configuration for the 'prometheus' job.
+  - job_name: prometheus  # Unique name for the job.
 
-    scrape_interval: 5s
-    scrape_timeout: 2s
-    honor_labels: true
+    scrape_interval: 5s  # Overrides the global scrape interval for this job.
+    scrape_timeout: 2s   # Sets the maximum time Prometheus waits for a scrape to complete.
+    honor_labels: true   # Determines whether existing labels should be retained.
 
+    # Static configurations specify the targets (endpoints) to scrape metrics from.
     static_configs:
-      - targets: ['collector-gateway:8889']
+      - targets: ['collector-gateway:8889']  # Specifies the target where metrics are scraped from.

@@ -49,18 +49,30 @@ console.log('users services is up and running on port 8090');
 
 redis.subscribe('my-channel', (err, data) => {
     console.log(`on subscribe`);
+
+    // Event handler for incoming messages on the subscribed channel
     redis.on("message", (channel, message) => {
+        // Parse the JSON message received from the channel
         const payload = JSON.parse(message);
+
+        // Extract the propagated context using OpenTelemetry
         const propagatedContext = api.propagation.extract(api.ROOT_CONTEXT, payload);
+
+        // Start a new span to represent the consumption of the message
         const span = api.trace.getTracer('@opentelemetry/instrumentation-ioredis').startSpan("consume a message", {
             attributes: {
                 message,
             }
         }, propagatedContext);
+
+        // End the span to indicate the completion of the operation
         span.end();
+
+        // Log the received message and channel
         console.log(`Received ${message} from ${channel}`);
     });
-})
+});
+
 
 setInterval(async () => {
     api.trace.getTracer('manual').startActiveSpan('Refesh cache', async (span) => {

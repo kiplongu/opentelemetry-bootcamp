@@ -29,16 +29,19 @@ const init = function (serviceName: string, metricPort: number) {
     const meter = new MeterProvider({ exporter: metricExporter, interval: 100000 }).getMeter(serviceName);
 
     // Define traces
-    const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
+    // const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
     const serviceResources = serviceSyncDetector.detect();
     const customResources = new Resource({'my-resource':1});
+
     const provider = new NodeTracerProvider({
         resource: serviceResources.merge(customResources)
 
     });
-    // const traceExporter = new CollectorTraceExporter({
-    //     url: 'http://localhost:4318/v1/trace'
-    // })
+
+    const traceExporter = new CollectorTraceExporter({
+        url: 'http://localhost:4318/v1/trace'
+    })
+    
     // provider.addSpanProcessor(new BatchSpanProcessor(traceExporter,)
         // scheduledDelayMillis:7000
     provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));

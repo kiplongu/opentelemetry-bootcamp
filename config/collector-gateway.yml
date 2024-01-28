@@ -1,67 +1,73 @@
+# OpenTelemetry Configuration
+
+# Receivers: Describes how the collector should receive data. In this case, it has an OTLP receiver
+# that listens on both HTTP and gRPC endpoints.
+
 receivers:
   otlp:
     protocols:
       http:
-        endpoint: 0.0.0.0:4319
+        endpoint: 0.0.0.0:4319  # Defines the HTTP endpoint for OTLP receiver.
       grpc:
-        endpoint: 0.0.0.0:4320
+        endpoint: 0.0.0.0:4320  # Defines the gRPC endpoint for OTLP receiver.
+
+# Processors: Defines a set of processors that are applied to incoming data.
+# For example, there's a batch processor with a timeout of 1 second, a resource processor
+# that inserts a specific key-value pair, and a tail sampling processor with certain policies (currently empty).
 
 processors:
   batch:
-    timeout: 1s
+    timeout: 1s  # Sets the timeout for the batch processor.
   resource:
     attributes:
       - key: test.key
         value: "gateway"
-        action: insert
+        action: insert  # Inserts a specific key-value pair into resource attributes.
   tail_sampling:
     decision_wait: 2s
     num_traces: 100
     expected_new_traces_per_sec: 1
-    policies:
-      [
-          # {
-          #   name: test-policy-1,
-          #   type: status_code,
-          #   status_code: {status_codes: [ERROR]}
-          # },
-          # {
-          #   name: test-policy-2,
-          #   type: latency,
-          #   latency: {threshold_ms: 1500}
-          # },
-      ]
+    policies: []  # Configures policies for the tail sampling processor (currently empty).
+
+# Exporters: Specifies where the processed data should be sent.
+# There are exporters for Prometheus, logging, and Jaeger. Each exporter has its own configuration settings.
+
 exporters:
   prometheus:
-    endpoint: "0.0.0.0:8889"
+    endpoint: "0.0.0.0:8889"  # Defines the Prometheus exporter endpoint.
     send_timestamps: true
     namespace: promexample
     const_labels:
-      label1: value1
-
+      label1: value1  # Sets constant labels for Prometheus exporter.
   logging:
-    loglevel: info
-
+    loglevel: info  # Sets the log level for the logging exporter.
   jaeger:
-    endpoint: jaeger:14250
+    endpoint: jaeger:14250  # Defines the Jaeger exporter endpoint.
     tls:
-      insecure: true
+      insecure: true  # Configures insecure TLS for Jaeger.
+
+# Extensions: Extensions provide additional functionality to the collector.
+# There are extensions for health checking, pprof (profiling and debugging), and zPages (debugging).
 
 extensions:
-  health_check:
+  health_check: {}  # Configures the health check extension.
   pprof:
-    endpoint: :1888
+    endpoint: :1888  # Defines the pprof extension endpoint.
   zpages:
-    endpoint: :55679
+    endpoint: :55679  # Defines the zPages extension endpoint.
+
+# Service: Configures the overall service settings, including the extensions to enable
+# and pipelines for traces and metrics. Each pipeline defines which receivers, processors,
+# and exporters to use.
 
 service:
-  extensions: [pprof, zpages, health_check]
+  extensions: [pprof, zpages, health_check]  # Enables specified extensions.
   pipelines:
     traces:
       receivers: [otlp]
       processors: [tail_sampling, batch, resource]
-      exporters: [logging, jaeger]
+      exporters: [logging, jaeger]  # Configures the trace pipeline.
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, prometheus]
+      exporters: [logging, prometheus]  # Configures the metrics pipeline.
