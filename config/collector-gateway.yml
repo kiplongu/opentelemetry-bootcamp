@@ -27,7 +27,22 @@ processors:
     decision_wait: 2s
     num_traces: 100
     expected_new_traces_per_sec: 1
-    policies: []  # Configures policies for the tail sampling processor (currently empty).
+    policies:
+      [
+          {
+            name: test-policy-1,
+            type: latency,
+            latency: {threshold_ms: 5000, upper_threshold_ms: 10000}
+          },
+          {
+            name: test-policy-2,
+            type: status_code,
+            status_code: {status_codes: [ERROR, UNSET]}
+          },
+      ]
+
+
+
 
 # Exporters: Specifies where the processed data should be sent.
 # There are exporters for Prometheus, logging, and Jaeger. Each exporter has its own configuration settings.

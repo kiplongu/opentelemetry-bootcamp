@@ -14,6 +14,7 @@ import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis'
 import { serviceSyncDetector } from 'opentelemetry-resource-detector-service';
 import { CollectorTraceExporter, CollectorMetricExporter, } from '@opentelemetry/exporter-collector';
 import WsInstrumentation from './ws-instrumentation/ws';
+import CustomSampler from './custom-sampler';
 
 
 const init = function (serviceName: string, metricPort: number) {
@@ -34,9 +35,12 @@ const init = function (serviceName: string, metricPort: number) {
     const customResources = new Resource({'my-resource':1});
 
     const provider = new NodeTracerProvider({
-        resource: serviceResources.merge(customResources)
+        resource: serviceResources.merge(customResources),
+        sampler: new CustomSampler()
 
     });
+
+
    // Create a trace exporter to send collected spans to a collector
     const traceExporter = new CollectorTraceExporter({
         url: 'http://localhost:4318/v1/trace'
