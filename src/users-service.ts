@@ -15,14 +15,14 @@ wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
         try{
         const payload = JSON.parse(message?.toString());
-        // // const propagatedContext = api.propagation.extract(api.ROOT_CONTEXT, payload);
-        // const wsSpan = tracer.startSpan('got ws message', {
-            // attributes: {
-                // 'payload': message?.toString()
-            // }});
+        const propagatedContext = api.propagation.extract(api.ROOT_CONTEXT, payload);
+        const wsSpan = tracer.startSpan('got ws message', {
+            attributes: {
+                'payload': message?.toString()
+            }});
         // }}, propagatedContext)
         console.log('received: %s', message);
-        // wsSpan.end();
+        wsSpan.end();
     } catch(e){
         console.error(e)
     }
@@ -74,10 +74,12 @@ redis.subscribe('my-channel', (err, data) => {
 });
 
 
+// Set up a periodic task to refresh cache every 6 seconds
 setInterval(async () => {
-    api.trace.getTracer('manual').startActiveSpan('Refesh cache', async (span) => {
+    // Retrieve the 'manual' tracer from the OpenTelemetry tracing API
+    api.trace.getTracer('manual').startActiveSpan('Refresh cache', async (span) => {
+        // Perform an asynchronous HTTP request to a mock API endpoint
         const apiResponse = await axios('https://mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8');
         span.end();
     });
-
-}, 6000)
+}, 6000);
