@@ -15,14 +15,14 @@ wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
         try{
         const payload = JSON.parse(message?.toString());
-        const propagatedContext = api.propagation.extract(api.ROOT_CONTEXT, payload);
-        const wsSpan = tracer.startSpan('got ws message', {
-            attributes: {
-                'payload': message?.toString()
-            }});
-        // }}, propagatedContext)
+        // const propagatedContext = api.propagation.extract(api.ROOT_CONTEXT, payload);
+        // const wsSpan = tracer.startSpan('got ws message', {
+        //     attributes: {
+        //         'payload': message?.toString()
+        //     }});
+        // // }}, propagatedContext)
         console.log('received: %s', message);
-        wsSpan.end();
+        // wsSpan.end();
     } catch(e){
         console.error(e)
     }

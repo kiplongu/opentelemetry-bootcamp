@@ -22,12 +22,12 @@ app.use((request, response, next) => {
 // Define an Express route for handling WebSocket communication at the '/ws' endpoint
 app.get('/ws', (req, res) => {
     const payload = { msg: 'Hi over ws' };
-    const wsSpan = tracer.startSpan('send ws message', {})
-    api.propagation.inject(api.trace.setSpan(api.context.active(), wsSpan), payload);
-    wsSpan.setAttribute('payload',JSON.stringify(payload))
+    // const wsSpan = tracer.startSpan('send ws message', {})
+    // api.propagation.inject(api.trace.setSpan(api.context.active(), wsSpan), payload);
+    // wsSpan.setAttribute('payload',JSON.stringify(payload))
 
     ws.send(JSON.stringify(payload));
-    wsSpan.end();
+    // wsSpan.end();
     res.json({ ws: true })
 })
 
